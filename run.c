@@ -2,6 +2,12 @@
 // Tuesday, May 21. 2024
 
 #include "rot13.h"
+#include <stdbool.h>
+
+#define CAPITAL_UPPER_BOUND 90
+#define CAPITAL_LOWER_BOUND 65
+#define LC_UPPER_BOUND 122
+#define LC_LOWER_BOUND 97
 
 void menu();
 void devInfo();
@@ -23,6 +29,7 @@ int main() {
     char * ret_arr;
 
     puts("welcome to the ROT-13 Encryption Tool...");
+    puts("Please note that the input does not accept any non-alphabetic characters. Any Capitalized letters will be converted to lowercase.");
     puts("please refer to the following menu for your next steps...");
 
     menu();
@@ -34,13 +41,37 @@ int main() {
         getchar();
         switch(choice) {
             case 1: 
-            
-                printf("Please enter your phrase (no more than 15 characters, please): ");
-                fgets(str_input, 15, stdin);
+                bool y = true;
+                do {
 
-                // printf("DEBUG: you entered: %s\n", str_input);
+                    
+                    printf("Please enter your phrase (no more than 15 characters, please): ");
+                    fgets(str_input, 15, stdin);
 
-                refine(&str_input[0], &refined_arr);
+                    // printf("DEBUG: you entered: %s\n", str_input);
+
+                    refine(&str_input[0], &refined_arr);
+
+                    // checks for invalid characters
+                    for (int x = 0; x < strlen(refined_arr); x++) {
+                        if ((int)(refined_arr[x]) <= CAPITAL_LOWER_BOUND || (int)(refined_arr[x]) >= CAPITAL_UPPER_BOUND && (int)(refined_arr[x]) <= LC_LOWER_BOUND || (int)(refined_arr[x]) >= LC_UPPER_BOUND) {
+                            y = true;
+                        } else {
+                            y = false;
+                        }
+                    }
+
+                } while(y);
+
+                // check for capital letters
+                for (int z = 0; z < strlen(refined_arr); z++) {
+                    // letter is upper case
+                    if ((int)(refined_arr[z]) >= CAPITAL_LOWER_BOUND && (int)(refined_arr[z]) <= CAPITAL_UPPER_BOUND) {
+                        // printf("letter %c selected...\n", refined_arr[z]);
+                        refined_arr[z] = refined_arr[z] + 32; 
+                    }
+                }
+
                 puts("DEBUG: refine method finished");
 
                 rotate(&refined_arr[0], &ret_arr);
@@ -55,7 +86,12 @@ int main() {
         puts("");
         if (!(choice == 3))
             menu();
+        
+        
     }
+    
+    free(ret_arr);
+
     // program exits
     return 0;
 }
